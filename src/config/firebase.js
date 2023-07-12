@@ -1,17 +1,17 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore';
 import { getStorage } from "firebase/storage";
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBrEKPI0pjN33ckW--zwYubqjHygfGEB2M",
-    authDomain: "tactile-acrobat-392115.firebaseapp.com",
-    projectId: "tactile-acrobat-392115",
-    storageBucket: "tactile-acrobat-392115.appspot.com",
-    messagingSenderId: "273536650521",
-    appId: "1:273536650521:web:c1ea4247af8dfceca60988",
-    measurementId: "G-6BMMY5GPJ3"
-  };
+  apiKey: "AIzaSyC1yu2UOlhZidDouovFKxnOLq_gumICOtE",
+  authDomain: "eventgo-b229a.firebaseapp.com",
+  projectId: "eventgo-b229a",
+  storageBucket: "eventgo-b229a.appspot.com",
+  messagingSenderId: "454624667020",
+  appId: "1:454624667020:web:c432adaf409fa71538e2a9",
+  measurementId: "G-7HLM7DHX3D"
+};
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
