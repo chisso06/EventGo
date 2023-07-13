@@ -1,3 +1,5 @@
+import './App.css';
+
 import React, { useEffect } from 'react';
 import { Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 
@@ -8,7 +10,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
 
 import { useEthers } from '@usedapp/core';
-import './App.css';
 import { APP_THEME, DEFAULT_HOME_PAGE } from './constants';
 
 const App = () => {
@@ -16,7 +17,7 @@ const App = () => {
   const navigate = useNavigate();
   const pathname = window.location.pathname;
 
-  const userRoute = pathname.startsWith('/user')
+  const userRoute = pathname.startsWith('/user');
 
   useEffect(() => {
     if (!account && userRoute && error) {
