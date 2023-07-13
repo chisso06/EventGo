@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, query, where } from "firebase/firesto
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { db } from "../../config/firebase";
+import GenerateImage from "../../scripts/GenerateImage";
 
 
 import UserSidebar from '../../components/navbar/UserSidebar';
@@ -61,7 +62,7 @@ const EventCompleted = ({account, randomNum}) => {
   }
 
   const getCommentList = async () => {
-  const commentsRef = query(collection(db, "comments"), where("eventId", "==", event_id));
+    const commentsRef = query(collection(db, "comments"), where("eventId", "==", event_id));
       try {
           const data = await getDocs(commentsRef);
           const filteredData = data.docs.map((doc) => ({
@@ -75,13 +76,12 @@ const EventCompleted = ({account, randomNum}) => {
 
   useEffect(() => {
     getEvent();
-    // setEvent(myEvent);
-      getCommentList();
+    getCommentList();
   }, []);
 
   function createImage() {
-
-    console.log("createImage");
+    GenerateImage(commentList, event);
+    // console.log("createImage");
   }
 
   return (
