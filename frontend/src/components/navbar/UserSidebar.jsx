@@ -153,7 +153,7 @@ const UserSidebar = ({ pageTitle, open, setOpen }) => {
                     <ListItemText primary="ギャラリー" />
                     </ListItemButton>
                 </ListItem>
-                <ListItem disablePadding onClick={() => {navigate("/createEvent/createEvent");}}>
+                <ListItem disablePadding onClick={() => {navigate("/createEvent");}}>
                     <ListItemButton>
                     <ListItemIcon>
                         <AddBoxIcon style={{ color: '#ffffff' }} />

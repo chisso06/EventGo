@@ -1,19 +1,14 @@
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useEffect, useState } from 'react';
 
 import { EventCards } from '../../components';
 import UserSidebar from '../../components/navbar/UserSidebar';
 
 const CreatedEvents = ({account}) => {
-
-  const navigate = useNavigate();
-
   const drawerWidth = 240;
-
-  const [open, setOpen] = React.useState(true);
-
+  const [open, setOpen] = useState(false);
   const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
       flexGrow: 1,
@@ -32,7 +27,6 @@ const CreatedEvents = ({account}) => {
       }),
     }),
   );
-
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -42,13 +36,29 @@ const CreatedEvents = ({account}) => {
     justifyContent: 'flex-end',
   }));
 
+  const [eventList, setEventList] = useState([]);
+  useEffect(() => {
+    const getEventList = async () => {
+      await axios.get("/eventList")
+        .then((res) => {
+          console.log("getEventList");
+          setEventList(res.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    getEventList();
+  }, []);
+
+
   return (
     <div>
       <Box sx={{ display: 'flex' }}>
         <UserSidebar open={open} setOpen={setOpen} pageTitle="作成したイベント" />
         <Main open={open}>
           <DrawerHeader />
-          <EventCards />
+          <EventCards eventList={eventList} />
         </Main>
       </Box>
     </div>

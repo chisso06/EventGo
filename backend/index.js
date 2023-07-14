@@ -1,5 +1,10 @@
 import express from "express";
-export { default as GenerateImage } from './scripts/GenerateImage.js';
+import CreateComment from "./scripts/CreateComment.js";
+import CreateEvent from "./scripts/CreateEvent.js";
+import GenerateImage from "./scripts/GenerateImage.js";
+import GetCommentList from "./scripts/GetCommentList.js";
+import GetEvent from "./scripts/GetEvent.js";
+import GetEventList from "./scripts/GetEventList.js";
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -18,19 +23,55 @@ app.use((req, res, next) => {
 })
 
 app.get("/", (req, res) => {
-	res.send('Hello World!');
+	res.send({ message: 'Hello World!' });
 });
 
-app.post("/", function(req, res) {
+app.get("/event", async (req, res) => {
+	const event = await GetEvent(req.query.eventId);
+	console.log(event);
+	res.send(event);
+})
+
+app.get("/commentList", async (req, res) => {
+	const commentList = await GetCommentList(req.query.eventId);
+	console.log(commentList);
+	res.send(commentList);
+})
+
+app.get("/eventList", async (req, res) => {
+	const eventList = await GetEventList();
+	console.log(eventList);
+	res.send(eventList);
+})
+
+app.post("/createEvent", async (req, res, next) => {
 	try {
-		res.json(req.body);
-	} catch(error) {
-		console.error(error);
+		const eventId = await CreateEvent(req.body);
+		res.send({eventId: eventId});
+	} catch(err) {
+		console.error(err);
+		next(err);
 	}
 });
 
-app.get('/api', (req, res) => {
-	res.json({ message: 'This is backend-api' });
+app.post("/createComment", async (req, res, next) => {
+	try {
+		const commentId = await CreateComment(req.body);
+		res.send({commentId: commentId});
+	} catch(err) {
+		console.error(err);
+		next(err);
+	}
+});
+
+app.post("/generateImage", async (req, res, next) => {
+	try {
+		const imageURL = await GenerateImage(req.query.eventId);
+		res.send({imageURL: imageURL});
+	} catch(err) {
+		console.error(err);
+		next(err);
+	}
 });
 
 app.listen(port, () => {

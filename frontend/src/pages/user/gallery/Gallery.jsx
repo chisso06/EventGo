@@ -1,18 +1,12 @@
-import React, { useState } from 'react';
 import { Box } from '@mui/material';
-import { useLocation, useNavigate } from 'react-router-dom';
 import { styled } from '@mui/material/styles';
+import { useState } from 'react';
 
 import UserSidebar from '../../../components/navbar/UserSidebar';
 
 const Gallery = ({account}) => {
-
-  const navigate = useNavigate();
-
   const drawerWidth = 240;
-
-  const [open, setOpen] = React.useState(true);
-
+  const [open, setOpen] = useState(true);
   const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
       flexGrow: 1,
@@ -31,7 +25,6 @@ const Gallery = ({account}) => {
       }),
     }),
   );
-
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',

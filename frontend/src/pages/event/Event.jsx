@@ -1,20 +1,15 @@
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import axios from "axios";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-import { EventDetail } from '../../components';
+import { CollectingComments, EventDetail } from '../../components';
 import UserSidebar from '../../components/navbar/UserSidebar';
 
-
 const Event = ({account}) => {
-
-  const navigate = useNavigate();
-
   const drawerWidth = 240;
-
-  const [open, setOpen] = React.useState(true);
-
+  const [open, setOpen] = useState(false);
   const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
       flexGrow: 1,
@@ -33,7 +28,6 @@ const Event = ({account}) => {
       }),
     }),
   );
-
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',
@@ -43,17 +37,51 @@ const Event = ({account}) => {
     justifyContent: 'flex-end',
   }));
 
+  const {eventId} = useParams();
+	const [event, setEvent] = useState([]);
+	const [commentList, setCommentList] = useState([]);
+
+  useEffect(() => {
+    const getEvent = async () => {
+      await axios.get("/event?eventId=" + eventId)
+        .then((res) => {
+          console.log("getEvent");
+          setEvent(res.data);
+        })
+        .catch((err) => { console.log(err); });
+    }
+    const getCommentList = async () => {
+      await axios.get("/commentList?eventId=" + eventId)
+        .then((res) => {
+          console.log("getCommentList");
+          setCommentList(res.data);
+        })
+        .catch((err) => { console.log(err); });
+    }
+    getEvent();
+    getCommentList();
+	}, []);
+
   return (
     <div>
       <Box sx={{ display: 'flex' }}>
         <UserSidebar open={open} setOpen={setOpen} pageTitle="Event Detail" />
         <Main open={open}>
           <DrawerHeader />
-          <EventDetail />
+          {(() => {
+            if (event.status == "generated_image") {
+              return (<EventDetail event={event} commentList={commentList} />);
+            } else if (event.status == "collecting_comments") {
+              return (<CollectingComments eventId={eventId} />);
+            } else {
+              console.error("error");
+              console.log(event);
+            }
+          })()}
         </Main>
       </Box>
     </div>
-  )
+  );
 }
 
 export default Event;

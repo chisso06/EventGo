@@ -1,32 +1,18 @@
-// import axios from "axios";
-// import { APIKEY } from "../config/deepl";
-
-function GenerateImage(commentList, event) {
+const GenerateImage = (commentList, event) => {
 	const {event_id} = useParams();
 
-	const getEvent = async() => {
-	  const eventRef = doc(db, "events", event_id);
-	  const eventDoc = await getDoc(eventRef);
-	  if (eventDoc.exists) {
-		console.log(eventDoc.data());
-		setEvent(eventDoc.data());
-	  } else {
-		console.log("No such document!");
-	  }
-	}
-  
-	const getCommentList = async () => {
-	  const commentsRef = query(collection(db, "comments"), where("eventId", "==", event_id));
-		try {
-			const data = await getDocs(commentsRef);
-			const filteredData = data.docs.map((doc) => ({
-				...doc.data(),
-			}));
-			setCommentList(filteredData);
-		} catch (err) {
-			console.error(err)
-		}
-	};
+	// const getCommentList = async () => {
+	//   const commentsRef = query(collection(db, "comments"), where("eventId", "==", event_id));
+	// 	try {
+	// 		const data = await getDocs(commentsRef);
+	// 		const filteredData = data.docs.map((doc) => ({
+	// 			...doc.data(),
+	// 		}));
+	// 		setCommentList(filteredData);
+	// 	} catch (err) {
+	// 		console.error(err)
+	// 	}
+	// };
   
 	// const baseURL = "https://api-free.deepl.com/v2/translate";
 	// const headers = {
@@ -66,6 +52,7 @@ function GenerateImage(commentList, event) {
 
 	console.log("GenerateImage");
 	// console.log(event.title);
+	return ("");
 }
 
 export default GenerateImage;

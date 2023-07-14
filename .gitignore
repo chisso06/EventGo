@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
-front/src/config
+frontend/src/config
+backend/config
