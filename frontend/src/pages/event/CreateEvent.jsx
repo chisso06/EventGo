@@ -1,19 +1,13 @@
 import { Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 import { EventForm } from '../../components';
 import UserSidebar from '../../components/navbar/UserSidebar';
 
 const CreateEvent = ({account}) => {
-
-  const navigate = useNavigate();
-
   const drawerWidth = 240;
-
-  const [open, setOpen] = React.useState(true);
-
+  const [open, setOpen] = useState(false);
   const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
     ({ theme, open }) => ({
       flexGrow: 1,
@@ -32,7 +26,6 @@ const CreateEvent = ({account}) => {
       }),
     }),
   );
-
   const DrawerHeader = styled('div')(({ theme }) => ({
     display: 'flex',
     alignItems: 'center',

@@ -1,20 +1,25 @@
-import { Autocomplete, Button, Grid, Typography } from '@mui/material';
-import TextField from '@mui/material/TextField';
+import { Autocomplete, Button, Grid, TextField, Typography } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import axios from 'axios';
 import { React, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { addDoc, collection } from 'firebase/firestore';
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import storage, { db } from '../../config/firebase';
 
-const EventDetails = () => {
-    const [file, setFile] = useState("");
-    const [percent, setPercent] = useState(0);
-    const [event, setEvent] = useState({title: '', location: '', photoURI: '', startTime: new Date(), endTime: new Date(), type: '', userId: '', userName: '', details: ''});
-
+const EventForm = () => {
+    const [event, setEvent] = useState({
+        title: '',
+        location: '',
+        startTime: new Date(),
+        endTime: new Date(),
+        type: '',
+        userId: '',
+        userName: '',
+        details: '',
+        status: 'collecting_comments',
+        imageURL: ''
+    });
     const navigate = useNavigate();
     const types = [
         { label: '音楽', category: 'music'},
@@ -28,154 +33,116 @@ const EventDetails = () => {
         { label: 'スポーツ', category: 'sports'},
         { label: '教育', category: 'education'},
         { label: 'その他', category: 'others'}
-      ];
+    ];
 
-      function handleChange(event) {
-        setFile(event.target.files[0]);
-    }
     function handleStartTime (time) {
         setEvent({ ...event, startTime: time.toString() })
-      };
-
+    };
     function handleEndTime (time) {
         setEvent({ ...event, endTime: time.toString() })
-      };
-    
- 
-    const handleUpload = () => {
-        if (!file) {
-            alert("Please upload an image first!");
-        }
- 
-        const storageRef = ref(storage, `/eventPhotos/${file.name}`);
- 
-        const uploadTask = uploadBytesResumable(storageRef, file);
- 
-        uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-                const percent = Math.round(
-                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-                );
- 
-                // update progress
-                setPercent(percent);
-            },
-            (err) => console.log(err),
-            () => {
-                // download url
-                getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                    console.log(url);
-                    setEvent({ ...event, photoURI: url })
-                });
-            }
-        );
     };
 
-    const addEvent = async (e) => {
-       
-        try {
-            const docRef = await addDoc(collection(db, "events"), {
-              event: event
-            });
-            console.log("Document written with ID: ", docRef.id);
-          } catch (e) {
-            console.error("Error adding document: ", e);
-          }
-    }
+    const handleChange = (e) => {
+		const {name, value} = e.target;
+		setEvent({ ...event, [name]: value });
+	};
 
-  return (
-    <div>
-        <Typography>下記のイベント情報を入力してください</Typography>
-        <Grid sx={{marginTop: 2}}>
-            <div>
-                <TextField
-                    sx={{width: 350}}
-                    id="outlined-textarea"
-                    label="イベント名"
-                    placeholder="イベント名"
-                    multiline
-                    size="small"
-                    onChange={(e) => setEvent({ ...event, title: e.target.value })}
-                />
-            </div>
-            <div>
-            <Autocomplete
-                disablePortal
-                loading
-                options={types}
-                getOptionLabel={(option) => option.label}
-                sx={{ width: 350, marginTop: 1 }}
-                renderInput={(params) => <TextField {...params} label="カテゴリー" />}
-                size="small"
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                onChange={(e, value) => setEvent({ ...event, type: value?.category })}
-            />
-            </div>
-            <div>
-                <TextField
-                    sx={{width: 350, marginTop: 1}}
-                    id="outlined-textarea"
-                    label="場所"
-                    placeholder="場所"
-                    multiline
-                    size="small"
-                    onChange={(e) => setEvent({ ...event, location: e.target.value })}
-                />
-            </div>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+    const handleSubmit = async () => {
+        await axios.post("/createEvent", event)
+            .then((res) => {
+                console.log(res.data.eventId);
+                navigate("/event/" + res.data.eventId);
+            })
+            .catch((err) => { console.log(err); });
+    };
+
+    return (
+        <div>
+            <Typography>下記のイベント情報を入力してください</Typography>
+            <Grid sx={{marginTop: 2}}>
                 <div>
-                    <DateTimePicker
-                        label="開始日時"
-                        value={event.startTime}
-                        onChange={handleStartTime}
-                        disablePast
-                        renderInput={(params) => <TextField {...params} sx={{width: 350, marginTop: 1}} size="small" />}
+                    <TextField
+                        sx={{width: 350}}
+                        id="outlined-textarea"
+                        label="イベント名"
+                        placeholder="イベント名"
+                        multiline
+                        size="small"
+                        name="title"
+                        onChange={handleChange}
                     />
                 </div>
                 <div>
-                    <DateTimePicker
-                        label="終了日時"
-                        value={event.endTime}
-                        onChange={handleEndTime}
-                        disablePast
-                        renderInput={(params) => <TextField {...params} sx={{width: 350, marginTop: 1}} size="small" />}
-                    />
-                </div>
-            </LocalizationProvider>
-            <div>
-                <Grid sx={{marginTop: 1}}>
-                    <Typography variant="subtitle2">ヘッダー画像をアップロード:</Typography>
-                    <Button variant="outlined" size="small" component="label">画像を選択<input type="file" onChange={handleChange} accept="/image/*" hidden /></Button>
-                    <Button variant="contained" onClick={handleUpload} size="small" sx={{marginLeft: 1}}>アップロードする</Button>
-                    <Typography variant="body2">({percent}% 完了)</Typography>
-                </Grid>
-            </div>
-            <div>
-                <TextField
-                    sx={{width: 350, top: 10}}
-                    id="outlined-textarea"
-                    label="概要"
-                    placeholder="概要"
-                    multiline
-                    rows={10}
+                <Autocomplete
+                    disablePortal
+                    loading
+                    options={types}
+                    getOptionLabel={(option) => option.label}
+                    sx={{ width: 350, marginTop: 1 }}
+                    renderInput={(params) => <TextField {...params} label="カテゴリー" />}
                     size="small"
-                    onChange={(e) => setEvent({ ...event, details: e.target.value })}
-                />
-            </div>
-            <div>
-                <Button
-                    sx={{width: 350, top: 20}}
-                    variant="contained"
-                    onClick={() => {
-                        addEvent();
-                        navigate("/createEvent/completed");
+                    isOptionEqualToValue={(option, value) => option.id === value.id}
+                    name="type"
+                    onChange={(e, value) => {
+                        setEvent({ ...event, type: value?.category })
                     }}
-                >作成</Button>
-            </div>
-        </Grid>
-    </div>
-  )
-}
+                />
+                </div>
+                <div>
+                    <TextField
+                        sx={{width: 350, marginTop: 1}}
+                        id="outlined-textarea"
+                        label="場所"
+                        placeholder="場所"
+                        multiline
+                        size="small"
+                        name="location"
+                        onChange={handleChange}
+                    />
+                </div>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div>
+                        <DateTimePicker
+                            label="開始日時"
+                            value={event.startTime}
+                            onChange={handleStartTime}
+                            disablePast
+                            renderInput={(params) => <TextField {...params} sx={{width: 350, marginTop: 1}} size="small" />}
+                        />
+                    </div>
+                    <div>
+                        <DateTimePicker
+                            label="終了日時"
+                            value={event.endTime}
+                            onChange={handleEndTime}
+                            disablePast
+                            renderInput={(params) => <TextField {...params} sx={{width: 350, marginTop: 1}} size="small" />}
+                        />
+                    </div>
+                </LocalizationProvider>
+                <div>
+                    <TextField
+                        sx={{width: 350, top: 10}}
+                        id="outlined-textarea"
+                        label="概要"
+                        placeholder="概要"
+                        multiline
+                        rows={10}
+                        size="small"
+                        name="details"
+                        onChange={handleChange}
+                    />
+                </div>
+                <div>
+                    <Button
+                        sx={{width: 350, top: 20}}
+                        variant="contained"
+                        onClick={handleSubmit}
+                    >作成</Button>
+                </div>
+            </Grid>
+        </div>
+    )
+};
 
-export default EventDetails
+export default EventForm;
